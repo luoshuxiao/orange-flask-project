@@ -24,7 +24,7 @@ class BaseModel(object):
 
 
 class User(BaseModel, db.Model, UserMixin):
-
+    """用户"""
     __tablename__ = 'ihome_user'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     phone = db.Column(db.String(11), unique=True)
@@ -188,6 +188,7 @@ class Area(BaseModel, db.Model):
 
 
 class Order(BaseModel,db.Model):
+    """订单"""
     __tablename__ = "ihome_order"
 
     id = db.Column(db.Integer, primary_key=True)

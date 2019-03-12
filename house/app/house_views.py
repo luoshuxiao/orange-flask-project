@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# 与房屋信息相关的视图函数
+
 import datetime
 import os
 import random
@@ -17,9 +20,12 @@ def index():
     return render_template('index.html')
 
 
-# 主页中的轮播图（随机生成）
 @house.route('/index_house_image_random/', methods=['GET'])
 def index_house_image_random():
+    """
+    主页中的轮播图（随机生成）
+    :return: 房屋信息(list类型)
+    """
     house = House.query.all()
     houses_info = []
     for i in range(3):
@@ -30,9 +36,12 @@ def index_house_image_random():
     return jsonify({'code': 200, 'msg': '请求成功', 'data': houses_info})
 
 
-# 获取区域和房屋设施数据
 @house.route('/area_facility_info/', methods=['GET'])
 def area_facility_info():
+    """
+    获取区域和房屋设施数据
+    :return: 城市区域和房屋基础设施全部信息（list类型）
+    """
     areas = Area.query.all()
     area_array = [area.name for area in areas]
     facilities = Facility.query.all()
@@ -49,10 +58,13 @@ def myhouse():
     return render_template('myhouse.html')
 
 
-# 获取我的房源数据
 @house.route('/myhouse_info/', methods=['GET'])
 @login_required
 def myhouse_info():
+    """
+    获取我的房源数据
+    :return: 房源具体信息（list类型，元素是字典）
+    """
     id = session.get('user_id')
     houses = House.query.filter(House.user_id == id)
     houses_info = []
@@ -62,13 +74,17 @@ def myhouse_info():
 
 
 @house.route('/detail/<int:id>/', methods=['GET'])
-def detail(id):
+def detail():
     return render_template('detail.html')
 
 
-# 获取房屋所有信息
 @house.route('/detail_info/<int:id>/', methods=['GET'])
 def detail_info(id):
+    """
+    获取房屋所有信息
+    :param id: 房屋id
+    :return: 房屋具体信息（list类型）
+    """
     house = House.query.filter(House.id == id).first()
     current_id = session.get('user_id')
     return jsonify({'code': 200, 'msg': '请求成功', 'data': [house.to_full_dict(), current_id]})
@@ -76,7 +92,7 @@ def detail_info(id):
 
 @house.route('/booking/<int:id>/', methods=['GET'])
 @login_required
-def booking(id):
+def booking():
     return render_template('booking.html')
 
 
@@ -86,10 +102,13 @@ def newhouse():
     return render_template('newhouse.html')
 
 
-# 发布新房源，修改数据库中的数据
 @house.route('/newhouse/', methods=['POST'])
 @login_required
 def newhouse_info():
+    """
+    发布新房源，修改数据库中的数据
+    :return: 当前状态房源的id
+    """
     house = House()
     house.user_id = session.get('user_id')
     house.title = request.form.get('title')
@@ -113,11 +132,14 @@ def newhouse_info():
     return jsonify({'code': 200, 'msg': '请求成功', 'data': house.id})
 
 
-# 发布新房源添加数据库房源的图片（html中数据和图片写的是两个form表单，所以两个接口，
-# 应该写成一个form一个接口，避免数据创建了，但是对应的图片没有创建）
 @house.route('/newhouse_img/', methods=['PATCH'])
 @login_required
 def newhouse_img():
+    """
+    发布新房源添加数据库房源的图片（html中数据和图片写的是两个form表单，所以两个接口，
+    应该写成一个form一个接口，避免数据创建了，但是对应的图片没有创建）
+    :return: 图片的相对路径
+    """
     id = request.form.get('house_id')
     image = request.files.get('house_image')
     #  获取绝对路径
@@ -142,9 +164,12 @@ def search():
     return render_template('search.html')
 
 
-# 获取与搜索条件匹配的房源数据（区域、时间、排序）
 @house.route('/area_house_info/', methods=['GET'])
 def area_house_info():
+    """
+    获取与搜索条件匹配的房源数据（区域、时间、排序）
+    :return: 匹配的房源数据
+    """
     area_id = request.args.get('area_id')
     sort = request.args.get('sort_key')
     if not request.args.get('start_date'):

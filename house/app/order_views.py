@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# 与订单相关的视图函数
 
 from flask import Blueprint, render_template, request, jsonify, session
 
@@ -14,19 +16,25 @@ def my_orders():
     return render_template('orders.html')
 
 
-# 获取我的订单数据
 @orders.route('/my_orders_info/', methods=['GET'])
 @login_required
 def my_orders_info():
+    """
+    获取我的订单数据
+    :return: 订单详情数据（list类型）
+    """
     user_id = session.get('user_id')
     order_list = [order.to_dict() for order in Order.query.filter(Order.user_id == user_id).all()]
     return jsonify({'code': 200, 'msg': '请求成功', 'data': order_list})
 
 
-# 创建我的订单（预定房间）
 @orders.route('/order_create/', methods=['POST'])
 @login_required
 def order_create():
+    """
+    创建我的订单（预定房间）
+    :return:
+    """
     user_id = session.get('user_id')
     start_date = request.form.get('sd')
     end_date = request.form.get('ed')
@@ -47,10 +55,10 @@ def order_create():
     return jsonify({'code': 200, 'msg': '请求成功'})
 
 
-# 发表评论
 @orders.route('/update_comment/', methods=['PATCH'])
 @login_required
 def update_comment():
+    """发表评论"""
     order_id = request.form.get('order_id')
     comment = request.form.get('comment')
     order = Order.query.filter_by(id=order_id).first()
@@ -66,10 +74,13 @@ def lorders():
     return render_template('lorders.html')
 
 
-# 获取客户订单数据
 @orders.route('/lorders_info/', methods=['GET'])
 @login_required
 def lorders_info():
+    """
+    获取客户订单数据
+    :return:  客户订单详情
+    """
     user_id = session.get('user_id')
     ids = [house.id for house in House.query.filter_by(user_id=user_id).all()]
     order_info = [order.to_dict() for order in Order.query.filter(Order.house_id.in_(ids)).all()]
@@ -78,10 +89,10 @@ def lorders_info():
     return jsonify({'code': 200, 'msg': '请求成功', 'data': order_info})
 
 
-# 修改订单状态、创建拒单原因
 @orders.route('/update_order_status/', methods=['PATCH'])
 @login_required
 def update_order_status():
+    """修改订单状态、创建拒单原因"""
     order_id = request.form.get('order_id')
     status = request.form.get('status')
     reject_reason = request.form.get('reject_reason')
